@@ -15,7 +15,7 @@
  * Author: Erasmux
  *
  * Based on the interactive governor By Mike Chan (mike@android.com)
- * which was adaptated to 2.6.29 kernel by Nadlabak (pavel@doshaska.net)
+ * which was adaptated to 2.6.29 kernel by Nadlabak (pavel@doshaska.net)                     
  * 
  * requires to add
  * EXPORT_SYMBOL_GPL(nr_running);
@@ -62,14 +62,14 @@ static unsigned int suspended;
  * The minimum amount of time to spend at a frequency before we can ramp down,
  * default is 45ms.
  */
-#define DEFAULT_DOWN_RATE_US 45000
+#define DEFAULT_DOWN_RATE_US 35000;
 static unsigned long down_rate_us;
 
 /*
  * When ramping up frequency with no idle cycles jump to at least this frequency.
  * Zero disables. Set a very high value to jump to policy max freqeuncy.
  */
-#define DEFAULT_UP_MIN_FREQ 998400
+#define DEFAULT_UP_MIN_FREQ 999999
 static unsigned int up_min_freq;
 
 /*
@@ -78,7 +78,7 @@ static unsigned int up_min_freq;
  * to minimize wakeup issues.
  * Set sleep_max_freq=0 to disable this behavior.
  */
-#define DEFAULT_SLEEP_MAX_FREQ 384000
+#define DEFAULT_SLEEP_MAX_FREQ CONFIG_MSM_CPU_FREQ_ONDEMAND_MIN
 static unsigned int sleep_max_freq;
 
 /*
@@ -97,7 +97,7 @@ static unsigned int ramp_up_step;
 /*
  * Max freqeuncy delta when ramping down. zero disables.
  */
-#define DEFAULT_MAX_RAMP_DOWN 384000
+#define DEFAULT_MAX_RAMP_DOWN 0
 static unsigned int max_ramp_down;
 
 /*
@@ -109,7 +109,7 @@ static unsigned long max_cpu_load;
 /*
  * CPU freq will be decreased if measured load < min_cpu_load;
  */
-#define DEFAULT_MIN_CPU_LOAD 35
+#define DEFAULT_MIN_CPU_LOAD 30
 static unsigned long min_cpu_load;
 
 
@@ -122,7 +122,7 @@ static
 struct cpufreq_governor cpufreq_gov_smartass = {
 	.name = "smartass",
 	.governor = cpufreq_governor_smartass,
-	.max_transition_latency = 8000000,
+	.max_transition_latency = 9000000,
 	.owner = THIS_MODULE,
 };
 
@@ -492,9 +492,6 @@ static int cpufreq_governor_smartass(struct cpufreq_policy *new_policy,
 		pm_idle = cpufreq_idle;
 
 		this_smartass->cur_policy = new_policy;
-		this_smartass->cur_policy->max = CONFIG_MSM_CPU_FREQ_ONDEMAND_MAX;
-		this_smartass->cur_policy->min = CONFIG_MSM_CPU_FREQ_ONDEMAND_MIN;
-		this_smartass->cur_policy->cur = CONFIG_MSM_CPU_FREQ_ONDEMAND_MAX;
 		this_smartass->enable = 1;
 
 		// notice no break here!
@@ -621,6 +618,5 @@ static void __exit cpufreq_smartass_exit(void)
 module_exit(cpufreq_smartass_exit);
 
 MODULE_AUTHOR ("Erasmux");
-MODULE_DESCRIPTION ("'cpufreq_smartass' - A smart cpufreq governor");
+MODULE_DESCRIPTION ("'cpufreq_minmax' - A smart cpufreq governor optimized for the hero!");
 MODULE_LICENSE ("GPL");
-

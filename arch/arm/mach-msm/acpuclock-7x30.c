@@ -83,24 +83,6 @@ static struct cpufreq_frequency_table freq_table[] = {
 	{ 0, 245760 },
 	{ 1, 368640 },
 	{ 2, 768000 },
-#if defined(CONFIG_MACH_SPADE) || defined(CONFIG_MACH_GLACIER)
-	{ 3, 1017600 },
-	{ 4, 1113600 },
-	{ 5, 1209600 },
-	{ 6, 1305600 },
-	{ 7, 1401600 },
-	{ 8, 1516800 },
-#ifndef CONFIG_JESUS_PHONE
-	{ 9, CPUFREQ_TABLE_END },
-#else
-	/* Just an example of some of the insanity I was able to pull off on my
-	   device */
-	{ 9, 1612800 },
-	{ 10, 1708800 },
-	{ 11, 1804800 },
-	{ 12, CPUFREQ_TABLE_END },
-#endif
-#else
 	{ 3, 806400 },
 	{ 4, 1017600 },
 	{ 5, 1113600 },
@@ -118,7 +100,6 @@ static struct cpufreq_frequency_table freq_table[] = {
 	{ 12, 1804800 },
 	{ 13, CPUFREQ_TABLE_END },
 #endif
-#endif
 };
 
 /* Use negative numbers for sources that can't be enabled/disabled */
@@ -133,15 +114,8 @@ static struct clkctl_acpu_speed acpu_freq_tbl[] = {
 	{ 245760, PLL_3,    5, 2,  61440,  900, VDD_RAW(900) },
 	{ 368640, PLL_3,    5, 1,  122800, 950, VDD_RAW(950) },
 	{ 768000, PLL_1,    2, 0,  153600, 1025, VDD_RAW(1025) },
-	/* Make sure any freq based from PLL_2 is a multiple of 19200! 
-	   Voltage tables are being very conservative and are not designed to
-	   be an undervolt of any sort. */
-#if defined(CONFIG_MACH_SPADE) || defined(CONFIG_MACH_GLACIER)
-	{ 1017600, PLL_2,   3, 0,  192000, 1075, VDD_RAW(1075) },
-#else
 	{ 806400, PLL_2,    3, 0,  192000, 1050, VDD_RAW(1050) },
 	{ 1017600, PLL_2,   3, 0,  192000, 1075, VDD_RAW(1075) },
-#endif
 	{ 1113600, PLL_2,   3, 0,  192000, 1100, VDD_RAW(1100) },
 	{ 1209600, PLL_2,   3, 0,  192000, 1150, VDD_RAW(1150) },
 	{ 1305600, PLL_2,   3, 0,  192000, 1200, VDD_RAW(1200) },
