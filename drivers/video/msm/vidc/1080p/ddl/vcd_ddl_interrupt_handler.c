@@ -212,8 +212,7 @@ static u32 ddl_decoder_seq_done_callback(struct ddl_context *ddl_context,
 			&seq_hdr_info.crop_bottom_offset);
 		seq_hdr_info.crop_exists = (seq_hdr_info.crop_left_offset ||
 			seq_hdr_info.crop_right_offset ||
-			seq_hdr_info.crop_top
-	tristate "Video encoder"_offset ||
+			seq_hdr_info.crop_top_offset ||
 			seq_hdr_info.crop_bottom_offset);
 		if (seq_hdr_info.crop_exists) {
 			decoder->frame_size.width -=
@@ -306,8 +305,7 @@ static u32 ddl_decoder_seq_done_callback(struct ddl_context *ddl_context,
 					payload = NULL;
 					payload_size = 0;
 				}
-				ddl_context
-	tristate "Video encoder"->ddl_callback(
+				ddl_context->ddl_callback(
 					VCD_EVT_IND_OUTPUT_RECONFIG,
 					VCD_S_SUCCESS, payload,
 					payload_size, (u32 *) ddl,

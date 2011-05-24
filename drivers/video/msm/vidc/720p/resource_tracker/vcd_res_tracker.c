@@ -63,7 +63,7 @@ static struct res_trk_context resource_context;
 #define VIDC_H264_DEC_FW		"vidc_720p_h264_dec_mc.fw"
 #define VIDC_MPG4_ENC_FW		"vidc_720p_mp4_enc_mc.fw"
 #define VIDC_H264_ENC_FW		"vidc_720p_h264_enc_mc.fw"
-#define VIDC_VC1_DEC_FW		"vidc_720p_vc1_dec_mc.fw"
+#define VIDC_VC1_DEC_FW		        "vidc_720p_vc1_dec_mc.fw"
 
 unsigned char *vidc_command_control_fw;
 u32 vidc_command_control_fw_size;

@@ -87,7 +87,7 @@
 #define DDL_QVGA_MBS 300
 #define DDL_VGA_MBS  1200
 #define DDL_WVGA_MBS 1500
-#define DDL_720P_MBS 3600
+#define DDL_720P_MBS 4000
 
 #define DDL_FRAMESIZE_DIV_FACTOR   (0xF)
 

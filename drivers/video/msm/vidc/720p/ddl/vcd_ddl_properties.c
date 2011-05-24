@@ -1910,7 +1910,7 @@ void ddl_set_initial_default_values(struct ddl_client_context *ddl)
 		encoder->frame_size.stride = 176;
 		encoder->frame_size.scan_lines = 144;
 		encoder->frame_rate.fps_numerator = 30;
-		encoder->frame_rate.fps_denominator = 1;
+		encoder->frame_rate.fps_denominator = 24;
 		ddl_set_default_enc_property(ddl);
 	}
 
