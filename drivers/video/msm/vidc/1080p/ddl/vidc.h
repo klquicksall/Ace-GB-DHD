@@ -46,6 +46,11 @@
 #define VIDC_1080P_RISC2HOST_CMD_EDFU_INT_RET       16
 #define VIDC_1080P_RISC2HOST_CMD_ERROR_RET          32
 
+#define VIDC_RISC2HOST_ARG2_VIDC_DISP_ERROR_STATUS_BMSK  0xffff0000
+#define VIDC_RISC2HOST_ARG2_VIDC_DISP_ERROR_STATUS_SHFT  16
+#define VIDC_RISC2HOST_ARG2_VIDC_DEC_ERROR_STATUS_BMSK   0x0000ffff
+#define VIDC_RISC2HOST_ARG2_VIDC_DEC_ERROR_STATUS_SHFT   0
+
 #define VIDC_1080P_ERROR_INVALID_CHANNEL_NUMBER                  1
 #define VIDC_1080P_ERROR_INVALID_COMMAND_ID                      2
 #define VIDC_1080P_ERROR_CHANNEL_ALREADY_IN_USE                  3
@@ -58,17 +63,23 @@
 #define VIDC_1080P_ERROR_OPEN_CH_ERROR_FRAME_START              10
 #define VIDC_1080P_ERROR_SEQ_START_ERROR_FRAME_START            11
 #define VIDC_1080P_ERROR_INIT_BUFFERS_ERROR_FRAME_START         12
-#define VIDC_1080P_ERROR_CODEC_LIMIT_EXCEEDED                   13
+#define VIDC_1080P_ERROR_RESOLUTION_CHANGED                     13
+#define VIDC_1080P_ERROR_INVALID_COMMAND_LAST_FRAME             14
+#define VIDC_1080P_ERROR_INVALID_COMMAND                        15
+#define VIDC_1080P_ERROR_INVALID_CODEC_TYPE                     16
+
 #define VIDC_1080P_ERROR_MEM_ALLOCATION_FAILED                  20
 #define VIDC_1080P_ERROR_INSUFFICIENT_CONTEXT_SIZE              25
+#define VIDC_1080P_ERROR_UNSUPPORTED_FEATURE_IN_PROFILE         27
+#define VIDC_1080P_ERROR_RESOLUTION_NOT_SUPPORTED               28
 
-#define VIDC_1080P_ERROR_UNSUPPORTED_FEATURE_IN_PROFILE   27
-#define VIDC_1080P_ERROR_RESOLUTION_NOT_SUPPORTED         28
 #define VIDC_1080P_ERROR_HEADER_NOT_FOUND                 52
+#define VIDC_1080P_ERROR_VOS_END_CODE_RECEIVED            53
 #define VIDC_1080P_ERROR_FRAME_RATE_NOT_SUPPORTED         62
 #define VIDC_1080P_ERROR_INVALID_QP_VALUE                 63
 #define VIDC_1080P_ERROR_INVALID_RC_REACTION_COEFFICIENT  64
 #define VIDC_1080P_ERROR_INVALID_CPB_SIZE_AT_GIVEN_LEVEL  65
+#define VIDC_1080P_ERROR_B_FRAME_NOT_SUPPORTED            66
 #define VIDC_1080P_ERROR_ALLOC_DPB_SIZE_NOT_SUFFICIENT    71
 #define VIDC_1080P_ERROR_NUM_DPB_OUT_OF_RANGE             74
 #define VIDC_1080P_ERROR_NULL_METADATA_INPUT_POINTER      77
@@ -79,8 +90,7 @@
 #define VIDC_1080P_ERROR_BIT_STREAM_BUF_EXHAUST           82
 #define VIDC_1080P_ERROR_DESCRIPTOR_BUFFER_EMPTY          83
 #define VIDC_1080P_ERROR_DMA_TX_NOT_COMPLETE              84
-
-#define VIDC_1080P_ERROR_MB_HEADER_NOT_DONE       85
+#define VIDC_1080P_ERROR_DESCRIPTOR_TABLE_ENTRY_INVALID   85
 #define VIDC_1080P_ERROR_MB_COEFF_NOT_DONE        86
 #define VIDC_1080P_ERROR_CODEC_SLICE_NOT_DONE     87
 #define VIDC_1080P_ERROR_VIDC_CORE_TIME_OUT       88
@@ -111,7 +121,6 @@
 #define VIDC_1080P_ERROR_SLICE_PARSE_ERROR       131
 
 #define VIDC_1080P_WARN_COMMAND_FLUSHED                  145
-
 #define VIDC_1080P_WARN_METADATA_NO_SPACE_NUM_CONCEAL_MB 150
 #define VIDC_1080P_WARN_METADATA_NO_SPACE_QP             151
 #define VIDC_1080P_WARN_METADATA_NO_SPACE_CONCEAL_MB     152
@@ -133,7 +142,6 @@
 #define VIDC_1080P_WARN_BIT_RATE_NOT_SUPPORTED           168
 #define VIDC_1080P_WARN_COLOR_DIFF_FORMAT_NOT_SUPPORTED  169
 #define VIDC_1080P_WARN_NULL_EXTRA_METADATA_POINTER      170
-
 #define VIDC_1080P_WARN_METADATA_NO_SPACE_MB_INFO        180
 #define VIDC_1080P_WARN_METADATA_NO_SPACE_SLICE_SIZE     181
 #define VIDC_1080P_WARN_RESOLUTION_WARNING               182
@@ -169,6 +177,8 @@
 #define VIDC_1080P_H264_LEVEL3p1   31
 #define VIDC_1080P_H264_LEVEL3p2   32
 #define VIDC_1080P_H264_LEVEL4     40
+#define VIDC_1080P_H264_LEVEL5p1   51
+#define VIDC_1080P_H264_LEVEL_MAX  VIDC_1080P_H264_LEVEL5p1
 
 #define VIDC_1080P_H263_LEVEL10    10
 #define VIDC_1080P_H263_LEVEL20    20
@@ -379,6 +389,7 @@ struct vidc_1080p_enc_frame_info{
 	u32 enc_luma_address;
 	u32 enc_chroma_address;
 	enum vidc_1080p_encode_frame enc_frame;
+	u32 meta_data_exists;
 };
 struct vidc_1080p_dec_disp_info{
 	u32 resl_change;
@@ -418,6 +429,8 @@ void vidc_1080p_set_host2risc_cmd(
 void vidc_1080p_get_risc2host_cmd(u32 *pn_risc2host_command,
 	u32 *pn_risc2host_arg1, u32 *pn_risc2host_arg2,
 	u32 *pn_risc2host_arg3, u32 *pn_risc2host_arg4);
+void vidc_1080p_get_risc2host_cmd_status(u32 err_status,
+	u32 *dec_err_status, u32 *disp_err_status);
 void vidc_1080p_clear_risc2host_cmd(void);
 void vidc_1080p_get_fw_version(u32 *pn_fw_version);
 void vidc_1080p_get_fw_status(u32 *pn_fw_status);
@@ -454,7 +467,7 @@ void vidc_1080p_set_mpeg4_encode_work_buffers(u32 skip_flag_buffer_offset,
 void vidc_1080p_set_encode_frame_size(u32 hori_size, u32 vert_size);
 void vidc_1080p_set_encode_profile_level(u32 encode_profile, u32 enc_level);
 void vidc_1080p_set_encode_field_picture_structure(u32 enc_field_picture);
-void vidc_1080p_set_encode_deblock_filter(u32 lf_enables);
+void vidc_1080p_set_decode_mpeg4_pp_filter(u32 lf_enables);
 void vidc_1080p_set_decode_qp_save_control(u32 enable_q_pout);
 void vidc_1080p_get_returned_channel_inst_id(u32 *pn_rtn_chid);
 void vidc_1080p_clear_returned_channel_inst_id(void);
@@ -514,7 +527,7 @@ void vidc_1080p_set_h264_encode_entropy(
 void vidc_1080p_set_h264_encode_loop_filter(
 	enum vidc_1080p_DBConfig db_config, u32 slice_alpha_offset,
 	u32 slice_beta_offset);
-void vidc_1080p_set_h264_encoder_ref_count(u32 max_reference);
+void vidc_1080p_set_h264_encoder_p_frame_ref_count(u32 max_reference);
 void vidc_1080p_set_h264_encode_8x8transform_control(u32 enable_8x8transform);
 void vidc_1080p_set_mpeg4_encode_quarter_pel_control(
 	u32 enable_mpeg4_quarter_pel);

@@ -17,6 +17,10 @@
  */
 
 #include "vcd_ddl.h"
+#include "vcd_ddl_metadata.h"
+#ifdef DDL_PROFILE
+static unsigned int first_time;
+#endif
 
 u32 ddl_device_init(struct ddl_init_config *ddl_init_config,
 	void *client_data)
@@ -50,15 +54,17 @@ u32 ddl_device_init(struct ddl_init_config *ddl_init_config,
 		ddl_init_config->core_virtual_base_addr;
 	ddl_context->client_data = client_data;
 	ddl_context->ddl_hw_response.arg1 = DDL_INVALID_INTR_STATUS;
+
+	ddl_context->frame_channel_depth = VCD_FRAME_COMMAND_DEPTH;
+
 	DDL_MSG_LOW("%s() : virtual address of core(%x)\n", __func__,
 		(u32) ddl_init_config->core_virtual_base_addr);
 	vidc_1080p_set_device_base_addr(
 		ddl_context->core_virtual_base_addr);
 	ddl_context->cmd_state =	DDL_CMD_INVALID;
 	ddl_client_transact(DDL_INIT_CLIENTS, NULL);
-	ddl_context->fw_ctxt_memory_size = DDL_FW_GLOVIDC_CONTEXT_SIZE;
-	ddl_context->fw_memory_size = ddl_context->fw_ctxt_memory_size +
-		DDL_FW_INST_SPACE_SIZE;
+	ddl_context->fw_memory_size =
+		DDL_FW_INST_GLOBAL_CONTEXT_SPACE_SIZE;
 	ptr = ddl_pmem_alloc(&ddl_context->dram_base_a,
 		ddl_context->fw_memory_size, DDL_KILO_BYTE(128));
 	if (!ptr) {
@@ -72,6 +78,15 @@ u32 ddl_device_init(struct ddl_init_config *ddl_init_config,
 			ddl_context->dram_base_a.align_physical_addr;
 		ddl_context->dram_base_b.align_virtual_addr  =
 			ddl_context->dram_base_a.align_virtual_addr;
+	}
+	if (!status) {
+		ptr = ddl_pmem_alloc(&ddl_context->metadata_shared_input,
+			DDL_METADATA_TOTAL_INPUTBUFSIZE,
+			DDL_LINEAR_BUFFER_ALIGN_BYTES);
+		if (!ptr) {
+			DDL_MSG_ERROR("ddl_device_init: metadata alloc fail");
+			status = VCD_ERR_ALLOC_FAIL;
+		}
 	}
 	if (!status && !ddl_fw_init(&ddl_context->dram_base_a)) {
 		DDL_MSG_ERROR("ddl_dev_init:fw_init_failed");
@@ -143,7 +158,8 @@ u32 ddl_open(u32 **ddl_handle, u32 decoding)
 			DDL_FW_AUX_HOST_CMD_SPACE_SIZE, sizeof(u32));
 	if (!ptr)
 		status = VCD_ERR_ALLOC_FAIL;
-	if (!status) {
+	if (!status && ddl_context->frame_channel_depth
+		== VCD_DUAL_FRAME_COMMAND_CHANNEL) {
 		ptr = ddl_pmem_alloc(&ddl->shared_mem[1],
 				DDL_FW_AUX_HOST_CMD_SPACE_SIZE, sizeof(u32));
 		if (!ptr) {
@@ -154,15 +170,25 @@ u32 ddl_open(u32 **ddl_handle, u32 decoding)
 	if (!status) {
 		memset(ddl->shared_mem[0].align_virtual_addr, 0,
 			DDL_FW_AUX_HOST_CMD_SPACE_SIZE);
-		memset(ddl->shared_mem[1].align_virtual_addr, 0,
-			DDL_FW_AUX_HOST_CMD_SPACE_SIZE);
+		if (ddl_context->frame_channel_depth ==
+			VCD_DUAL_FRAME_COMMAND_CHANNEL) {
+			memset(ddl->shared_mem[1].align_virtual_addr, 0,
+				DDL_FW_AUX_HOST_CMD_SPACE_SIZE);
+		}
 		DDL_MSG_LOW("ddl_state_transition: %s ~~> DDL_CLIENT_OPEN",
 		ddl_get_state_string(ddl->client_state));
 		ddl->client_state = DDL_CLIENT_OPEN;
 		ddl->codec_data.hdr.decoding = decoding;
 		ddl->decoding = decoding;
+		ddl_set_default_meta_data_hdr(ddl);
 		ddl_set_initial_default_values(ddl);
 		*ddl_handle	= (u32 *) ddl;
+	} else {
+		ddl_pmem_free(&ddl->shared_mem[0]);
+		if (ddl_context->frame_channel_depth
+			== VCD_DUAL_FRAME_COMMAND_CHANNEL)
+			ddl_pmem_free(&ddl->shared_mem[1]);
+		ddl_client_transact(DDL_FREE_CLIENT, &ddl);
 	}
 	return status;
 }
@@ -188,7 +214,9 @@ u32 ddl_close(u32 **ddl_handle)
 		return VCD_ERR_ILLEGAL_OP;
 	}
 	ddl_pmem_free(&(*pp_ddl)->shared_mem[0]);
-	ddl_pmem_free(&(*pp_ddl)->shared_mem[1]);
+	if (ddl_context->frame_channel_depth ==
+		VCD_DUAL_FRAME_COMMAND_CHANNEL)
+		ddl_pmem_free(&(*pp_ddl)->shared_mem[1]);
 	DDL_MSG_LOW("ddl_state_transition: %s ~~> DDL_CLIENT_INVALID",
 	ddl_get_state_string((*pp_ddl)->client_state));
 	(*pp_ddl)->client_state = DDL_CLIENT_INVALID;
@@ -208,7 +236,11 @@ u32 ddl_encode_start(u32 *ddl_handle, void *client_data)
 
 	DDL_MSG_HIGH("ddl_encode_start");
 #ifdef DDL_PROFILE
-	ddl_reset_time_variables(1);
+	if (first_time < 2) {
+		ddl_reset_time_variables(1);
+		first_time++;
+	 }
+	ddl_get_core_start_time(1);
 #endif
 	ddl_context = ddl_get_context();
 	if (!DDL_IS_INITIALIZED(ddl_context)) {
@@ -257,7 +289,7 @@ u32 ddl_encode_start(u32 *ddl_handle, void *client_data)
 	if (!ddl_take_command_channel(ddl_context, ddl, client_data))
 		return VCD_ERR_BUSY;
 	ddl_vidc_channel_set(ddl);
-	return VCD_S_SUCCESS;
+	return status;
 }
 
 u32 ddl_decode_start(u32 *ddl_handle, struct vcd_sequence_hdr *header,
@@ -315,7 +347,6 @@ u32 ddl_decode_start(u32 *ddl_handle, struct vcd_sequence_hdr *header,
 	} else {
 		decoder->header_in_start = false;
 		decoder->decode_config.sequence_header_len = 0;
-		ddl_set_default_decoder_buffer_req(decoder, true);
 	}
 	ddl_vidc_channel_set(ddl);
 	return status;
@@ -447,8 +478,8 @@ u32 ddl_encode_frame(u32 *ddl_handle,
 	if ((ddl->codec_data.encoder.output_buf_req.sz +
 		output_bit->vcd_frm.offset) >
 		output_bit->vcd_frm.alloc_len)
-		DDL_MSG_ERROR("ddl_enc_frame:offset_large,\
-			Exceeds_min_buf_size");
+		DDL_MSG_ERROR("ddl_enc_frame:offset_large,"
+			"Exceeds_min_buf_size");
 	if (!DDLCLIENT_STATE_IS(ddl, DDL_CLIENT_WAIT_FOR_FRAME)) {
 		DDL_MSG_ERROR("ddl_enc_frame:Wrong_state");
 		return VCD_ERR_ILLEGAL_OP;
@@ -553,7 +584,7 @@ u32 ddl_reset_hw(u32 mode)
 {
 	struct ddl_context *ddl_context;
 	struct ddl_client_context *ddl;
-	u32 i_client_num;
+	u32 i;
 
 	DDL_MSG_HIGH("ddl_reset_hw");
 	DDL_MSG_LOW("ddl_reset_hw:called");
@@ -564,14 +595,13 @@ u32 ddl_reset_hw(u32 mode)
 		vidc_1080p_do_sw_reset(VIDC_1080P_RESET_IN_SEQ_FIRST_STAGE);
 		msleep(DDL_SW_RESET_SLEEP);
 		vidc_1080p_do_sw_reset(VIDC_1080P_RESET_IN_SEQ_SECOND_STAGE);
-		vidc_1080p_release_sw_reset();
+		msleep(DDL_SW_RESET_SLEEP);
 		ddl_context->core_virtual_base_addr = NULL;
 	}
 	ddl_context->device_state = DDL_DEVICE_NOTINIT;
-	for (i_client_num = 0; i_client_num < VCD_MAX_NO_CLIENT;
-		++i_client_num) {
-		ddl = ddl_context->ddl_clients[i_client_num];
-		ddl_context->ddl_clients[i_client_num] = NULL;
+	for (i = 0; i < VCD_MAX_NO_CLIENT; i++) {
+		ddl = ddl_context->ddl_clients[i];
+		ddl_context->ddl_clients[i] = NULL;
 		if (ddl) {
 			ddl_release_client_internal_buffers(ddl);
 			ddl_client_transact(DDL_FREE_CLIENT, &ddl);

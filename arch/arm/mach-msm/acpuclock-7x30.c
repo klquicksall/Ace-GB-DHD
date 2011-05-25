@@ -91,8 +91,10 @@ static struct cpufreq_frequency_table freq_table[] = {
 	{ 8, 1401600 },
 	{ 9, 1516800 },
 	{ 10, 1612800 },
+	{ 11, 1708800 },
+//	{ 12, 1804800 },
 #ifndef CONFIG_JESUS_PHONE
-	{ 11, CPUFREQ_TABLE_END },
+	{ 12, CPUFREQ_TABLE_END },
 #else
 	/* Just an example of some of the insanity I was able to pull off on my
 	   device */
@@ -114,15 +116,17 @@ static struct clkctl_acpu_speed acpu_freq_tbl[] = {
 	{ MAX_AXI_KHZ, SRC_AXI, 1, 0, 61440, 900, VDD_RAW(900) },
 	{ 245760, PLL_3,    5, 2,  61440,  900, VDD_RAW(900) },
 	{ 368640, PLL_3,    5, 1,  122800, 900, VDD_RAW(900) },
-	{ 768000, PLL_1,    2, 0,  192000, 1025, VDD_RAW(1025) },
-	{ 806400, PLL_2,    3, 0,  192000, 1050, VDD_RAW(1050) },
-	{ 1017600, PLL_2,   3, 0,  192000, 1075, VDD_RAW(1075) },
-	{ 1113600, PLL_2,   3, 0,  192000, 1100, VDD_RAW(1100) },
-	{ 1209600, PLL_2,   3, 0,  192000, 1150, VDD_RAW(1150) },
-	{ 1305600, PLL_2,   3, 0,  192000, 1200, VDD_RAW(1200) },
-	{ 1401600, PLL_2,   3, 0,  192000, 1250, VDD_RAW(1250) },
-	{ 1516800, PLL_2,   3, 0,  192000, 1350, VDD_RAW(1350) },
-	{ 1612800, PLL_2,   3, 0,  192000, 1400, VDD_RAW(1400) },
+	{ 768000, PLL_1,    2, 0,  153600, 1025, VDD_RAW(1025) },
+	{ 806400, PLL_2,    3, 0,  UINT_MAX, 1050, VDD_RAW(1050) },
+	{ 1017600, PLL_2,   3, 0,  UINT_MAX, 1075, VDD_RAW(1075) },
+	{ 1113600, PLL_2,   3, 0,  UINT_MAX, 1100, VDD_RAW(1100) },
+	{ 1209600, PLL_2,   3, 0,  UINT_MAX, 1150, VDD_RAW(1150) },
+	{ 1305600, PLL_2,   3, 0,  UINT_MAX, 1200, VDD_RAW(1200) },
+	{ 1401600, PLL_2,   3, 0,  UINT_MAX, 1250, VDD_RAW(1250) },
+	{ 1516800, PLL_2,   3, 0,  UINT_MAX, 1350, VDD_RAW(1350) },
+	{ 1612800, PLL_2,   3, 0,  UINT_MAX, 1350, VDD_RAW(1350) },
+	{ 1708800, PLL_2,   3, 0,  UINT_MAX, 1400, VDD_RAW(1400) },
+	//{ 1804800, PLL_2,   3, 0,  UINT_MAX, 1400, VDD_RAW(1400) },
 #ifdef CONFIG_JESUS_PHONE
 	{ 1708800, PLL_2,   3, 0,  192000, 1400, VDD_RAW(1400) },
 	{ 1804800, PLL_2,   3, 0,  192000, 1450, VDD_RAW(1450) },

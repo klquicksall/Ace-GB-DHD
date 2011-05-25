@@ -52,7 +52,7 @@ static cpumask_t work_cpumask;
  * The minimum ammount of time to spend at a frequency before we can ramp down,
  * default is 50ms.
  */
-#define DEFAULT_MIN_SAMPLE_TIME 30000;
+#define DEFAULT_MIN_SAMPLE_TIME 45000;
 static unsigned long min_sample_time;
 
 static int cpufreq_governor_interactive(struct cpufreq_policy *policy,
@@ -64,7 +64,7 @@ static
 struct cpufreq_governor cpufreq_gov_interactive = {
 	.name = "interactive",
 	.governor = cpufreq_governor_interactive,
-	.max_transition_latency = 8000000,
+	.max_transition_latency = 7000000,
 	.owner = THIS_MODULE,
 };
 

@@ -62,7 +62,7 @@ static unsigned int suspended;
  * The minimum amount of time to spend at a frequency before we can ramp down,
  * default is 45ms.
  */
-#define DEFAULT_DOWN_RATE_US 35000;
+#define DEFAULT_DOWN_RATE_US 45000;
 static unsigned long down_rate_us;
 
 /*
@@ -109,7 +109,7 @@ static unsigned long max_cpu_load;
 /*
  * CPU freq will be decreased if measured load < min_cpu_load;
  */
-#define DEFAULT_MIN_CPU_LOAD 30
+#define DEFAULT_MIN_CPU_LOAD 35
 static unsigned long min_cpu_load;
 
 
@@ -122,7 +122,7 @@ static
 struct cpufreq_governor cpufreq_gov_smartass = {
 	.name = "smartass",
 	.governor = cpufreq_governor_smartass,
-	.max_transition_latency = 8000000,
+	.max_transition_latency = 7000000,
 	.owner = THIS_MODULE,
 };
 
