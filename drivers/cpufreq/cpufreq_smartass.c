@@ -62,7 +62,7 @@ static unsigned int suspended;
  * The minimum amount of time to spend at a frequency before we can ramp down,
  * default is 45ms.
  */
-#define DEFAULT_DOWN_RATE_US 45000;
+#define DEFAULT_DOWN_RATE_US 40000;
 static unsigned long down_rate_us;
 
 /*
@@ -78,7 +78,7 @@ static unsigned int up_min_freq;
  * to minimize wakeup issues.
  * Set sleep_max_freq=0 to disable this behavior.
  */
-#define DEFAULT_SLEEP_MAX_FREQ CONFIG_MSM_CPU_FREQ_ONDEMAND_MIN
+#define DEFAULT_SLEEP_MAX_FREQ 245760
 static unsigned int sleep_max_freq;
 
 /*
