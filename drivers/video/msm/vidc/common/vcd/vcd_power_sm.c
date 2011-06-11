@@ -150,7 +150,10 @@ u32 vcd_device_power_event(struct vcd_dev_ctxt *dev_ctxt, u32 event,
 			    dev_ctxt->reqd_perf_lvl >
 			    0 ? dev_ctxt->
 			    reqd_perf_lvl : VCD_MIN_PERF_LEVEL;
-			rc = vcd_set_perf_level(dev_ctxt, set_perf_lvl);
+
+			rc = vcd_set_perf_level(dev_ctxt, set_perf_lvl,
+				cctxt);
+
 			break;
 		}
 	}
@@ -195,8 +198,10 @@ u32 vcd_client_power_event(
 					dev_ctxt->reqd_perf_lvl -=
 						cctxt->reqd_perf_lvl;
 					cctxt->status.req_perf_lvl = false;
+
 					rc = vcd_set_perf_level(dev_ctxt,
-						dev_ctxt->reqd_perf_lvl);
+						dev_ctxt->reqd_perf_lvl,
+						cctxt);
 				}
 			}
 
@@ -214,7 +219,8 @@ u32 vcd_client_power_event(
 					cctxt->status.req_perf_lvl = true;
 
 					rc = vcd_set_perf_level(dev_ctxt,
-						dev_ctxt->reqd_perf_lvl);
+						dev_ctxt->reqd_perf_lvl,
+						cctxt);
 				}
 			}
 			break;
@@ -236,11 +242,15 @@ u32 vcd_enable_clock(struct vcd_dev_ctxt *dev_ctxt,
 		rc = VCD_ERR_FAIL;
 	} else if (dev_ctxt->pwr_clk_state ==
 		VCD_PWRCLK_STATE_ON_NOTCLOCKED) {
+
 		set_perf_lvl =
 				dev_ctxt->reqd_perf_lvl >
 				0 ? dev_ctxt->
 				reqd_perf_lvl : VCD_MIN_PERF_LEVEL;
-		rc = vcd_set_perf_level(dev_ctxt, set_perf_lvl);
+
+		rc = vcd_set_perf_level(dev_ctxt, set_perf_lvl,
+			cctxt);
+
 		if (!VCD_FAILED(rc)) {
 			if (res_trk_enable_clocks()) {
 				dev_ctxt->pwr_clk_state =
@@ -283,9 +293,11 @@ u32 vcd_disable_clock(struct vcd_dev_ctxt *dev_ctxt)
 	return rc;
 }
 
-u32 vcd_set_perf_level(struct vcd_dev_ctxt *dev_ctxt, u32 perf_lvl)
+u32 vcd_set_perf_level(struct vcd_dev_ctxt *dev_ctxt,
+	u32 perf_lvl, struct vcd_clnt_ctxt *cctxt)
 {
 	u32 rc = VCD_S_SUCCESS;
+
 	if (!vcd_core_is_busy(dev_ctxt)) {
 		if (res_trk_set_perf_level(perf_lvl,
 			&dev_ctxt->curr_perf_lvl, dev_ctxt)) {
@@ -309,16 +321,21 @@ u32 vcd_update_clnt_perf_lvl(
 	u32 rc = VCD_S_SUCCESS;
 	struct vcd_dev_ctxt *dev_ctxt = cctxt->dev_ctxt;
 	u32 new_perf_lvl;
+
 	new_perf_lvl =
 	    frm_p_units * fps->fps_numerator / fps->fps_denominator;
+
 	if (cctxt->status.req_perf_lvl) {
 		dev_ctxt->reqd_perf_lvl =
 		    dev_ctxt->reqd_perf_lvl - cctxt->reqd_perf_lvl +
 		    new_perf_lvl;
+
 		rc = vcd_set_perf_level(cctxt->dev_ctxt,
-			dev_ctxt->reqd_perf_lvl);
+			dev_ctxt->reqd_perf_lvl, cctxt);
 	}
+
 	cctxt->reqd_perf_lvl = new_perf_lvl;
+
 	return rc;
 }
 

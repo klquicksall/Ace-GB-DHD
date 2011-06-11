@@ -526,7 +526,6 @@ struct venc_qprange{
 };
 struct venc_intraperiod{
 	unsigned long	num_pframes;
-	unsigned long	num_bframes;
 };
 struct venc_seqheader{
 	unsigned char *hdrbufptr;
