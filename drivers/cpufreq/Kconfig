@@ -61,8 +61,6 @@ choice
 	  This option sets which CPUFreq governor shall be loaded at
 	  startup. If in doubt, select 'performance'.
 
-
-
 config CPU_FREQ_DEFAULT_GOV_PERFORMANCE
 	bool "performance"
 	select CPU_FREQ_GOV_PERFORMANCE
@@ -70,18 +68,6 @@ config CPU_FREQ_DEFAULT_GOV_PERFORMANCE
 	  Use the CPUFreq governor 'performance' as default. This sets
 	  the frequency statically to the highest frequency supported by
 	  the CPU.
-config CPU_FREQ_DEFAULT_GOV_INTERACTIVE
-	bool "interactive"
-	select CPU_FREQ_GOV_INTERACTIVE
-	help
-	'interactive' - as default
-
-config CPU_FREQ_DEFAULT_GOV_SMARTASS
-	bool "smartass"
-	select CPU_FREQ_GOV_SMARTASS
-	select CPU_FREQ_GOV_PERFORMANCE
-	help
-	Use the CPUFreq governor 'smartass' as default.
 
 config CPU_FREQ_DEFAULT_GOV_POWERSAVE
 	bool "powersave"
@@ -91,6 +77,20 @@ config CPU_FREQ_DEFAULT_GOV_POWERSAVE
 	  Use the CPUFreq governor 'powersave' as default. This sets
 	  the frequency statically to the lowest frequency supported by
 	  the CPU.
+
+config CPU_FREQ_DEFAULT_GOV_SMARTASS
+	bool "smartass"
+	select CPU_FREQ_GOV_SMARTASS
+	select CPU_FREQ_GOV_PERFORMANCE
+	help
+	  Use the CPUFreq governor 'smartass' as default.
+
+config CPU_FREQ_DEFAULT_GOV_SMARTASS2
+	bool "smartass2"
+	select CPU_FREQ_GOV_SMARTASS2
+	select CPU_FREQ_GOV_PERFORMANCE2
+	help
+	  Use the CPUFreq governor 'smartass' as default.
 
 config CPU_FREQ_DEFAULT_GOV_USERSPACE
 	bool "userspace"
@@ -151,10 +151,17 @@ config CPU_FREQ_GOV_SMARTASS
 	tristate "'smartass' cpufreq governor"
 	depends on CPU_FREQ
 	help
-	smartass' - a "smart" optimized governor for the hero!
+	  smartass' - a "smart" optimized governor for the hero!
 
-	If in doubt, say N.
+          If in doubt, say Y.
 
+config CPU_FREQ_GOV_SMARTASS2
+	tristate "'smartass2' cpufreq governor"
+	depends on CPU_FREQ
+	help
+          smartass2' - a "slightly more agressive smart" optimized governor!
+ 
+	  If in doubt, say N.
 
 config CPU_FREQ_GOV_POWERSAVE
 	tristate "'powersave' governor"
@@ -208,13 +215,11 @@ config CPU_FREQ_GOV_ONDEMAND_INPUT
 	  Enable installation of an input event handler which will ramp up the
 	  CPU to max frequency when an input event is received.
 
-
 config CPU_FREQ_GOV_INTERACTIVE
 	tristate "'interactive' cpufreq policy governor"
 	help
-	'interactive' - This driver adds a dynamic cpufreq policy governor.
-	Designed for low latency burst workloads. Scaling it done when coming
-	out of idle instead of polling.
+	  'interactive' - This driver adds a dynamic cpufreq policy governor
+	  designed for latency-sensitive workloads.
 
 config CPU_FREQ_GOV_CONSERVATIVE
 	tristate "'conservative' cpufreq governor"
@@ -238,5 +243,13 @@ config CPU_FREQ_GOV_CONSERVATIVE
 	  For details, take a look at linux/Documentation/cpu-freq.
 
 	  If in doubt, say N.
+
+config CPU_FREQ_VDD_LEVELS
+	bool "CPU Vdd levels sysfs interface"
+	depends on CPU_FREQ_STAT
+	depends on ARCH_MSM7X30
+	default n
+	help
+	  CPU Vdd levels sysfs interface
 
 endif	# CPU_FREQ
