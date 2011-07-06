@@ -493,6 +493,16 @@ config MACH_GLACIER
        help
          Support for the Qualcomm MSM7x30 Glacier board.
 
+config OVERLAY_FORCE_UPDATE
+       depends on MACH_GLACIER || MACH_SPEEDY
+       depends on MSM_MDP40
+       default y
+       bool "Force overlay to update screen"
+       help
+         Update the screen when the overlay is updated.
+         Do not use this if your framework updates the
+         screen when the overlay is updated.
+
 config MACH_SAGA
        depends on ARCH_MSM7X30
        depends on !MSM_STACKED_MEMORY
@@ -1483,6 +1493,13 @@ config ARCH_MSM_FLASHLIGHT
         help
           The flashlight driver is for MSM series.
 
+config ARCH_MSM_FLASHLIGHT_DEATH_RAY
+	bool "Enable high-brightness (death ray) mode"
+	depends on ARCH_MSM_FLASHLIGHT
+	default n
+	help
+	  Enables a high-brightness mode for the flash LED. Dangerous
+
 config VIRTUAL_KPANIC_SRC
 	depends on VIRTUAL_KPANIC_PARTITION
 	string "Partition to steal from"
@@ -1687,6 +1704,11 @@ config ACPUCLOCK_OVERCLOCKING
 	default n
 	depends on CPU_FREQ && !PERFLOCK
 	depends on ARCH_MSM7X30
+
+config JESUS_PHONE
+        bool "Enable support for unstable CPU frequencies"
+        default n
+        depends on ACPUCLOCK_OVERCLOCKING
 
 config HTC_SMEM_MSMC1C2_DEBUG
 	bool "MSMC1/MSMC2 shared memory debug"
