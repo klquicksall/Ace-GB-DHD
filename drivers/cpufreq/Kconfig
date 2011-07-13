@@ -87,7 +87,7 @@ config CPU_FREQ_DEFAULT_GOV_SMARTASS
 
 config CPU_FREQ_DEFAULT_GOV_SMOOTHASS
 	bool "smoothass"
-	select CPU_FREQ_GOV_SMOOTHMASS
+	select CPU_FREQ_GOV_SMOOTHASS
 	select CPU_FREQ_GOV_PERFORMANCE2
 	help
 	  Use the CPUFreq governor 'smartass' as default.
