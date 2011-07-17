@@ -103,11 +103,11 @@ static struct cpufreq_frequency_table freq_table[] = {
 	{ 17, 1459200 },
 	{ 18, 1536000 },
 	{ 19, 1612800 },
-#ifdef CONFIG_JESUS_PHONE
 	{ 20, 1689600 },
 	{ 21, 1766400 },
 	{ 22, 1843200 },
 	{ 23, 1920000 },
+#ifdef CONFIG_JESUS_PHONE
 //	{ 24, 1996800 },
 	{ 25, CPUFREQ_TABLE_END },
 #else
@@ -145,11 +145,11 @@ static struct clkctl_acpu_speed acpu_freq_tbl[] = {
 	{ 1459200, PLL_2,   3, 0,  192000, 1225, VDD_RAW(1225) },
 	{ 1536000, PLL_2,   3, 0,  192000, 1300, VDD_RAW(1300) },
 	{ 1612800, PLL_2,   3, 0,  192000, 1350, VDD_RAW(1350) },
-#ifdef CONFIG_JESUS_PHONE
 	{ 1689600, PLL_2,   3, 0,  192000, 1400, VDD_RAW(1400) },
 	{ 1766400, PLL_2,   3, 0,  192000, 1425, VDD_RAW(1425) },
 	{ 1843200, PLL_2,   3, 0,  192000, 1450, VDD_RAW(1450) },
 	{ 1920000, PLL_2,   3, 0,  192000, 1475, VDD_RAW(1475) },
+#ifdef CONFIG_JESUS_PHONE
 //	{ 1996800, PLL_2,   3, 0,  192000, 1475, VDD_RAW(1475) },
 #endif
 	{ 0 }
