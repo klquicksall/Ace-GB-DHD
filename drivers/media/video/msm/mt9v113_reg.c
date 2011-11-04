@@ -757,7 +757,7 @@ static struct mt9v113_i2c_reg_conf register_init_tb2[] = {
 #ifdef CONFIG_MSM_CAMERA_8X60
 	{0x0990, 0x0024, WORD_LEN, 0},/* 0x0027: mirror/flip , 0x0024: none*/
 #else
-	{0x0990, 0x0027, WORD_LEN, 0},/* 0x0027: mirror/flip , 0x0024: none*/
+	{0x0990, 0x0025, WORD_LEN, 0},/* 0x0027: mirror/flip , 0x0024: none*/
 #endif
 	{0x098C, 0x2719, WORD_LEN, 0},
 	{0x0990, 0x001A, WORD_LEN, 0},

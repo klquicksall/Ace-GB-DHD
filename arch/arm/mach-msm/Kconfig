@@ -494,11 +494,11 @@ config MACH_GLACIER
          Support for the Qualcomm MSM7x30 Glacier board.
 
 config OVERLAY_FORCE_UPDATE
-       depends on MACH_GLACIER || MACH_SPEEDY
-       depends on MSM_MDP40
-       default y
-       bool "Force overlay to update screen"
-       help
+        depends on MACH_GLACIER || MACH_SPEEDY || MACH_VIVO || MACH_VIVOW || MACH_SAGA
+        depends on MSM_MDP40
+        default y
+        bool "Force overlay to update screen"
+        help
          Update the screen when the overlay is updated.
          Do not use this if your framework updates the
          screen when the overlay is updated.
@@ -701,10 +701,32 @@ config TROUT_BATTCHG
 	default n
 	bool "Trout battery / charger driver"
 
-config HTC_BATTCHG
+
+choice
 	depends on MSM_ONCRPCROUTER && POWER_SUPPLY
-	default n
-	bool "HTC battery / charger driver"
+	prompt "Select HTC battery / charger driver version"
+	default HTC_BATTCHG_NONE
+	help
+	  HTC battery / charger driver.
+
+	config HTC_BATTCHG_NONE
+	  bool "None"
+
+	config HTC_BATTCHG
+	  bool "7x30 Version"
+	  help
+	    7x30 Version
+
+	config HTC_BATTCHG_VIVO
+	  bool "Vivo/Vivow Version"
+	  help
+	    Vivo/Vivow Version
+
+	config HTC_BATTCHG_SAGA
+	  bool "Saga Version"
+	  help
+	    Saga Version
+endchoice
 
 config HTC_BATT_CORE
 	depends on POWER_SUPPLY
@@ -717,7 +739,7 @@ config HTC_BATT8x60
 	bool "HTC battery driver for 8x60"
 
 config HTC_BATTCHG_SMEM
-	depends on HTC_BATTCHG
+	depends on HTC_BATTCHG || HTC_BATTCHG_VIVO
 	default n
 	bool "Read Battery Info via SMEM"
 
@@ -1409,6 +1431,13 @@ config MSM7KV2_1X_AUDIO
           Enables QDSP5V2-based audio drivers for audio playbacks and
           voice call (for 1.x code base).
 
+config HTC_VOICE_DUALMIC
+	bool "HTC Dual Mic feature"
+	depends on MSM7KV2_1X_AUDIO
+	default n
+	help
+	  Enables Dual Mic features.
+
 config MSM_QDSP6
 	tristate "QDSP6 support"
 	depends on ARCH_QSD8X50
@@ -1493,13 +1522,6 @@ config ARCH_MSM_FLASHLIGHT
         help
           The flashlight driver is for MSM series.
 
-config ARCH_MSM_FLASHLIGHT_DEATH_RAY
-	bool "Enable high-brightness (death ray) mode"
-	depends on ARCH_MSM_FLASHLIGHT
-	default n
-	help
-	  Enables a high-brightness mode for the flash LED. Dangerous
-
 config VIRTUAL_KPANIC_SRC
 	depends on VIRTUAL_KPANIC_PARTITION
 	string "Partition to steal from"
@@ -1512,13 +1534,6 @@ config MICROP_COMMON
 	depends on I2C
 	help
 	  HTC Microp-P support.
-
-config HTC_VOICE_DUALMIC
-	tristate "HTC Dualmic functionality"
-        depends on (ARCH_MSM7X30)
-        default n
-        help
-          Enable dual-mic functinality to do noise suppresion during voice call.
 
 config HTC_HEADSET_MGR
 	tristate "HTC headset manager driver"
@@ -1698,17 +1713,10 @@ config ACPUCLOCK_LIMIT_768MHZ
 	default n
 	help
 		Support to limit the CPU frequency at 768MHz.
-
-config ACPUCLOCK_OVERCLOCKING
-	bool "Enable support for CPU overclocking"
-	default n
-	depends on CPU_FREQ && !PERFLOCK
-	depends on ARCH_MSM7X30
-
-config JESUS_PHONE
-        bool "Enable support for unstable CPU frequencies"
-        default n
-        depends on ACPUCLOCK_OVERCLOCKING
+config NUTTER
+  	bool "Nutter mode - Max O/C 1.8GHz"
+  	default n
+  	depends on CPU_FREQ && !PERFLOCK
 
 config HTC_SMEM_MSMC1C2_DEBUG
 	bool "MSMC1/MSMC2 shared memory debug"

@@ -35,7 +35,7 @@ struct tps65200_platform_data {
 	int charger_check;
 };
 
-#ifdef CONFIG_TPS65200
+#if defined(CONFIG_TPS65200) || defined(CONFIG_TPS65200_VIVO)
 extern int tps_set_charger_ctrl(u32 ctl);
 #else
 static int tps_set_charger_ctrl(u32 ctl) {return 0 ; }

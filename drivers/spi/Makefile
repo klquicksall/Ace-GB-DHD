@@ -49,7 +49,17 @@ obj-$(CONFIG_SPI_STMP3XXX)		+= spi_stmp.o
 obj-$(CONFIG_SPI_NUC900)		+= spi_nuc900.o
 obj-$(CONFIG_SPI_QSD)			+= spi_qsd.o
 obj-$(CONFIG_SPI_QSD_NEW)		+= spi_qsdnew.o
+obj-$(CONFIG_SPI_QSD_NEW_VIVO)		+= spi_qsdnew_vivo.o
+obj-$(CONFIG_SPI_QSD_NEW_SAGA)		+= spi_qsdnew_saga.o
+ifdef CONFIG_SPI_QSD_NEW
 obj-$(CONFIG_SPI_QUP)			+= spi_qsdnew.o
+endif
+ifdef CONFIG_SPI_QSD_NEW_VIVO
+obj-$(CONFIG_SPI_QUP)			+= spi_qsdnew_vivo.o
+endif
+ifdef CONFIG_SPI_QSD_NEW_SAGA
+obj-$(CONFIG_SPI_QUP)			+= spi_qsdnew_saga.o
+endif
 obj-$(CONFIG_SPI_CRUCIAL_OJ)	        += spi_oj.o
 obj-$(CONFIG_SPI_AIC3254)		+= spi_aic3254.o
 

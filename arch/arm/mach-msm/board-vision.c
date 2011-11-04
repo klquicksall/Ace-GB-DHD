@@ -147,22 +147,6 @@ static struct platform_device usb_mass_storage_device = {
 	},
 };
 
-#ifdef CONFIG_USB_ANDROID_RNDIS
-static struct usb_ether_platform_data rndis_pdata = {
-	/* ethaddr is filled by board_serialno_setup */
-	.vendorID       = 0x18d1,
-	.vendorDescr    = "Google, Inc.",
-};
-
-static struct platform_device rndis_device = {
-	.name   = "rndis",
-	.id     = -1,
-	.dev    = {
-		.platform_data = &rndis_pdata,
-	},
-};
-#endif
-
 static struct android_usb_platform_data android_usb_pdata = {
 	.vendor_id	= 0x0bb4,
 	.product_id	= 0x0c91,
@@ -192,9 +176,6 @@ void vision_add_usb_devices(void)
 	msm_device_hsusb.dev.platform_data = &msm_hsusb_pdata;
 	config_vision_usb_id_gpios(0);
 	platform_device_register(&msm_device_hsusb);
-#ifdef CONFIG_USB_ANDROID_RNDIS
-	platform_device_register(&rndis_device);
-#endif
 	platform_device_register(&usb_mass_storage_device);
 	platform_device_register(&android_usb_device);
 }
@@ -339,7 +320,7 @@ static struct microp_led_config up_led_config[] = {
 		.name = "button-backlight",
 		.type = LED_PWM,
 		.led_pin = 1 << 0,
-		.init_value = 0,
+		.init_value = 30,
 		.fade_time = 5,
 	},
 	{
@@ -2280,7 +2261,7 @@ static struct bcm_bt_lpm_platform_data bcm_bt_lpm_pdata = {
 	.request_clock_on_locked = msm_hs_request_clock_on_locked,
 };
 
-struct platform_device vision_bcm_bt_lpm_device = {
+struct platform_device bcm_bt_lpm_device = {
 	.name = "bcm_bt_lpm",
 	.id = 0,
 	.dev = {
@@ -2293,20 +2274,24 @@ struct platform_device vision_bcm_bt_lpm_device = {
 #define BDADDR_STR_SIZE 18
 
 static char bdaddr[BDADDR_STR_SIZE];
-extern unsigned char *get_bt_bd_ram(void);
 
-static void bt_export_bd_address(void)
+module_param_string(bdaddr, bdaddr, sizeof(bdaddr), 0400);
+MODULE_PARM_DESC(bdaddr, "bluetooth address");
+
+static int __init parse_tag_bdaddr(const struct tag *tag)
 {
-        unsigned char cTemp[6];
+	unsigned char *b = (unsigned char *)&tag->u;
 
-        memcpy(cTemp, get_bt_bd_ram(), 6);
-        sprintf(bdaddr, "%02x:%02x:%02x:%02x:%02x:%02x",
-                cTemp[0], cTemp[1], cTemp[2], cTemp[3], cTemp[4], cTemp[5]);
-        printk(KERN_INFO "BT HW address=%s\n", bdaddr);
+	if (tag->hdr.size != ATAG_BDADDR_SIZE)
+		return -EINVAL;
+
+	snprintf(bdaddr, BDADDR_STR_SIZE, "%02X:%02X:%02X:%02X:%02X:%02X",
+			b[0], b[1], b[2], b[3], b[4], b[5]);
+
+        return 0;
 }
 
-module_param_string(bdaddr, bdaddr, sizeof(bdaddr), S_IWUSR | S_IRUGO);
-MODULE_PARM_DESC(bdaddr, "bluetooth address");
+__tagtable(ATAG_BDADDR, parse_tag_bdaddr);
 
 #elif defined(CONFIG_SERIAL_MSM_HS)
 static struct msm_serial_hs_platform_data msm_uart_dm1_pdata = {
@@ -2350,7 +2335,7 @@ MODULE_PARM_DESC(bt_fw_version, "BT's fw version");
 static struct platform_device *devices[] __initdata = {
 	&msm_device_uart2,
 #ifdef CONFIG_SERIAL_MSM_HS_PURE_ANDROID
-	&vision_bcm_bt_lpm_device,
+	&bcm_bt_lpm_device,
 #endif
 	&msm_device_smd,
 	&vision_rfkill,
@@ -2648,8 +2633,10 @@ static void __init vision_init(void)
 
 	msm_clock_init();
 
+	#ifndef CONFIG_SERIAL_MSM_HS_PURE_ANDROID
 	/* for bcm */
 	bt_export_bd_address();
+	#endif
 
 #if defined(CONFIG_MSM_SERIAL_DEBUGGER)
 	if (!opt_disable_uart2)

@@ -15,11 +15,9 @@ obj-$(CONFIG_SENSORS_AKM8975)   += akm8975.o
 obj-$(CONFIG_SENSORS_AKM8976)	+= akm8976.o
 obj-$(CONFIG_SENSORS_BMA150)    += bma150.o
 obj-$(CONFIG_SENSORS_BMA250)	+= bma250.o
-
 obj-$(CONFIG_DS1682)		+= ds1682.o
 obj-$(CONFIG_SENSORS_PCA963X)	+= pca963x.o
 obj-$(CONFIG_SENSORS_TSL2550)	+= tsl2550.o
-#obj-$(CONFIG_SENSORS_MT9T013)	+= mt9t013.o
 obj-$(CONFIG_VP_A1026)		+= a1026.o
 obj-$(CONFIG_AMP_TPA2051D3)	+= tpa2051d3.o
 obj-$(CONFIG_AMP_TPA2026)	+= tpa2026.o
@@ -31,7 +29,10 @@ obj-$(CONFIG_INPUT_ISL29028)	+= isl29028.o
 obj-$(CONFIG_INPUT_ISL29029)	+= isl29029.o
 obj-$(CONFIG_SMB329)            += smb329.o
 obj-$(CONFIG_TPS65200)          += tps65200.o
+obj-$(CONFIG_TPS65200_SAGA)     += tps65200.o
+obj-$(CONFIG_TPS65200_VIVO)     += tps65200_vivo.o
 obj-$(CONFIG_INPUT_CAPELLA_CM3628)          += cm3628.o
+obj-$(CONFIG_INPUT_CAPELLA_CM3628_SAGA)     += cm3628_saga.o
 obj-$(CONFIG_SENSORS_CAPSENSE)	+= cap_sense.o
 obj-$(CONFIG_SENSORS_CAPSENSE_EXPRESS)	+= cap_sense_express.o
 

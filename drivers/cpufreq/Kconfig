@@ -78,6 +78,12 @@ config CPU_FREQ_DEFAULT_GOV_POWERSAVE
 	  the frequency statically to the lowest frequency supported by
 	  the CPU.
 
+config CPU_FREQ_DEFAULT_GOV_SMARTASS2
+	bool "smartass2"
+	select CPU_FREQ_GOV_SMARTASS2
+	help
+	  Use the CPUFreq governor 'smartassV2' as default.
+
 config CPU_FREQ_DEFAULT_GOV_SMARTASS
 	bool "smartass"
 	select CPU_FREQ_GOV_SMARTASS
@@ -160,6 +166,13 @@ config CPU_FREQ_GOV_PERFORMANCE
 	  module will be called cpufreq_performance.
 
 	  If in doubt, say Y.
+
+config CPU_FREQ_GOV_SMARTASS2
+	tristate "'smartassV2' cpufreq governor"
+	depends on CPU_FREQ
+	help
+	  'smartassV2' - a "smart" governor
+	  If in doubt, say N.
 
 config CPU_FREQ_GOV_SMARTASS
 	tristate "'smartass' cpufreq governor"

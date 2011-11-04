@@ -9,11 +9,7 @@
 #include <asm/gpio.h>
 #include <asm/io.h>
 #include <linux/skbuff.h>
-#ifdef CONFIG_BCM4329_PURE_ANDROID
-#include <linux/wlan_plat.h>
-#else
 #include <linux/wifi_tiwlan.h>
-#endif
 
 #include "board-speedy.h"
 
@@ -81,11 +77,7 @@ static struct resource speedy_wifi_resources[] = {
 		.name		= "bcm4329_wlan_irq",
 		.start		= MSM_GPIO_TO_INT(SPEEDY_GPIO_WIFI_IRQ),
 		.end		= MSM_GPIO_TO_INT(SPEEDY_GPIO_WIFI_IRQ),
-#ifdef CONFIG_BCM4329_PURE_ANDROID
-		.flags		= IORESOURCE_IRQ | IORESOURCE_IRQ_HIGHLEVEL | IORESOURCE_IRQ_SHAREABLE,
-#else
 		.flags          = IORESOURCE_IRQ | IORESOURCE_IRQ_LOWEDGE,
-#endif
 	},
 };
 
@@ -94,10 +86,7 @@ static struct wifi_platform_data speedy_wifi_control = {
 	.set_reset      = speedy_wifi_reset,
 	.set_carddetect = speedy_wifi_set_carddetect,
 	.mem_prealloc   = speedy_wifi_mem_prealloc,
-#ifndef CONFIG_BCM4329_PURE_ANDROID
-	.dot11n_enable  = 1,
-	.cscan_enable   = 1,
-#endif
+//	.dot11n_enable  = 1,
 };
 
 static struct platform_device speedy_wifi_device = {
@@ -148,7 +137,6 @@ int __init speedy_wifi_init(void)
 	speedy_wifi_update_nvs("sd_oobonly=1\n");
 	speedy_wifi_update_nvs("btc_params80=0\n");
 	speedy_wifi_update_nvs("btc_params6=30\n");
-        speedy_wifi_update_nvs("btc_params70=0x32\n");
 	speedy_init_wifi_mem();
 	ret = platform_device_register(&speedy_wifi_device);
 	return ret;

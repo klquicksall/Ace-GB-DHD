@@ -202,12 +202,31 @@ config SPI_QSD
 	  This driver can also be built as a module.  If so, the module
 	  will be called spi_qsd.
 
-config SPI_QSD_NEW
-	tristate "Qualcomm MSM SPI support"
-	default n
-	depends on SPI_QSD
-	help
-	  none
+choice
+        depends on SPI_QSD
+        prompt "Select SPI_QSD_NEW Version"
+        default SPI_QSD_NEW_NONE
+        help
+	  Qualcomm MSM SPI support
+
+        config SPI_QSD_NEW_NONE
+                bool "None"
+
+        config SPI_QSD_NEW
+                bool "7x30 Version"
+                help
+                  Qualcomm MSM SPI support 7x30 version
+
+        config SPI_QSD_NEW_VIVO
+                bool "Vivo/Mecha Version"
+                help
+                  Qualcomm MSM SPI support vivo/mecha version
+
+        config SPI_QSD_NEW_SAGA
+                bool "Saga Version"
+                help
+                  Qualcomm MSM SPI support saga version
+endchoice
 
 config SPI_QUP
 	#tristate "Qualcomm MSM SPI QUPe Support"
@@ -241,6 +260,14 @@ config SPI_AIC3254
 	depends on ARCH_MSM7X30 || ARCH_MSM8X60
 	help
 	  TI AIC3254 is external codec for audio RX
+
+config SPI_AIC3254_SELF_POWER_DOWN
+	tristate "TI AIC3254 self powerdown support"
+	depends on SPI_AIC3254
+	default y
+	help
+	  This option allow the driver to self power down when both
+	  up and down link are off
 
 config SPI_OMAP_UWIRE
 	tristate "OMAP1 MicroWire"
