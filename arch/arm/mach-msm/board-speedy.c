@@ -149,8 +149,8 @@ static int flashlight_control(int mode)
 static struct camera_flash_cfg msm_camera_sensor_flash_cfg = {
        .camera_flash           = flashlight_control,
        .num_flash_levels       = FLASHLIGHT_NUM,
-       .low_temp_limit         = 10,
-       .low_cap_limit          = 15,
+       .low_temp_limit         = 5,
+       .low_cap_limit          = 10,
 };
 
 static int pm8058_gpios_init(struct pm8058_chip *pm_chip)

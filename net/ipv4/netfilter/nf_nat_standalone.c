@@ -113,7 +113,7 @@ nf_nat_fn(unsigned int hooknum,
 		}
 	}
 
-	switch ((int)ctinfo) {
+	switch (ctinfo) {
 	case IP_CT_RELATED:
 	case IP_CT_RELATED+IP_CT_IS_REPLY:
 		if (ip_hdr(skb)->protocol == IPPROTO_ICMP) {

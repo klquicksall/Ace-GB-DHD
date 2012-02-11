@@ -32,6 +32,7 @@
 #include <linux/workqueue.h>
 #include <linux/android_pmem.h>
 #include <linux/clk.h>
+#include <linux/switch.h>
 #include <linux/timer.h>
 
 #include "vidc_type.h"
@@ -51,6 +52,13 @@
 #define ERR(x...) printk(KERN_ERR "[VID] " x)
 
 #define VID_DEC_NAME		"msm_vidc_dec"
+
+static struct switch_dev vdec_switch = {
+	.name = "vdec", /* This is not typo. We use same uevent as encoder */
+};
+
+#define VDEC_STATE_OFF 0
+#define VDEC_STATE_ON  (1 << 0)
 
 static struct vid_dec_dev *vid_dec_device_p;
 static dev_t vid_dec_dev_num;
@@ -1158,12 +1166,14 @@ static int vid_dec_ioctl(struct inode *inode, struct file *file,
 		result = vid_dec_start_stop(client_ctx, true);
 		if (!result)
 			return -EIO;
+		switch_set_state(&vdec_switch, VDEC_STATE_ON);
 		break;
 	}
 	case VDEC_IOCTL_CMD_STOP:
 	{
 		DBG("VDEC_IOCTL_CMD_STOP\n");
 		result = vid_dec_start_stop(client_ctx, false);
+		switch_set_state(&vdec_switch, VDEC_STATE_OFF);
 		if (!result)
 			return -EIO;
 		break;
@@ -1418,12 +1428,16 @@ static int vid_dec_open(struct inode *inode, struct file *file)
 	DBG(" Virtual Address of ioremap is %p\n", vid_dec_device_p->virt_base);
 	if (!vid_dec_device_p->num_clients) {
 		if (!vidc_load_firmware())
+			{
+			mutex_unlock(&vid_dec_device_p->lock);
 			return -ENODEV;
+			}
 	}
 
 	client_index = vid_dec_get_empty_client_index();
 	if (client_index == -1) {
 		ERR("%s() : No free clients client_index == -1\n", __func__);
+		mutex_unlock(&vid_dec_device_p->lock);
 		return -ENODEV;
 	}
 	client_ctx = &vid_dec_device_p->vdec_clients[client_index];
@@ -1467,6 +1481,7 @@ static int vid_dec_release(struct inode *inode, struct file *file)
 #ifndef USE_RES_TRACKER
 	vidc_disable_clk();
 #endif
+	switch_set_state(&vdec_switch, VDEC_STATE_OFF);
 	INFO("msm_vidc_dec: Return from %s()", __func__);
 	return 0;
 }
@@ -1589,6 +1604,9 @@ static int __init vid_dec_init(void)
 		goto error_vid_dec_cdev_add;
 	}
 	vid_dec_vcd_init();
+	if (switch_dev_register(&vdec_switch) < 0) {
+		printk(KERN_ERR "vdec: fail to register vdec switch!\n");
+	}
 	return 0;
 
 error_vid_dec_cdev_add:

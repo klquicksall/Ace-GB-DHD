@@ -106,3 +106,4 @@ static inline int msm_spm_init(struct msm_spm_platform_data *data, int nr_devs)
 #endif  /* CONFIG_MSM_SPM */
 
 #endif  /* __ARCH_ARM_MACH_MSM_SPM_H */
+

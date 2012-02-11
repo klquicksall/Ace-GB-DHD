@@ -24,7 +24,6 @@
 #include "devices.h"
 #include <mach/board.h>
 #include <mach/board_htc.h>
-#include <mach/irqs.h>
 #include <mach/msm_hsusb.h>
 #include <linux/usb/android_composite.h>
 
@@ -214,18 +213,28 @@ static struct kgsl_platform_data kgsl_pdata = {
 	.high_axi_2d = MSM_AXI_FLOW_2D_GPU_HIGH,
 #else
 	/* AXI rates in KHz */
-	.high_axi_3d = 192000,
+	.high_axi_3d = 245760,
 	.high_axi_2d = 192000,
 #endif
-	.max_grp2d_freq = 0,
-	.min_grp2d_freq = 0,
-	.set_grp2d_async = NULL, /* HW workaround, run Z180 SYNC @ 192 MHZ */
-	.max_grp3d_freq = 245760000,
-	.min_grp3d_freq = 192000000,
+	.max_grp2d_freq = 245760000,
+	.min_grp2d_freq = 245760000,
+	.set_grp2d_async = set_grp2d_async,
+	.max_grp3d_freq = 353280000,
+	.min_grp3d_freq = 245760000,
 	.set_grp3d_async = set_grp3d_async,
 	.imem_clk_name = "imem_clk",
 	.grp3d_clk_name = "grp_clk",
 	.grp2d0_clk_name = "grp_2d_clk",
+#ifdef CONFIG_KGSL_PER_PROCESS_PAGE_TABLE
+	.pt_va_size = SZ_128M - SZ_64K,
+	/* Maximum of 32 concurrent processes */
+	.pt_max_count = 32,
+#else
+	.pt_va_size = SZ_128M,
+	/* We only ever have one pagetable for everybody */
+	.pt_max_count = 1,
+
+#endif
 };
 #endif
 

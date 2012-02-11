@@ -110,9 +110,9 @@ static int locked_enable_mdp_irq(struct mdp_info *mdp, uint32_t mask)
 		enable_irq(mdp->irq);
 		if (mdp->state & MDP_STATE_STANDBY) {
 #ifdef CONFIG_MSM_MDP40
-			clk_set_rate(mdp->ebi1_clk, 153000000);
+			clk_set_rate(mdp->ebi1_clk, 192000000);
 #else
-			clk_set_rate(mdp->ebi1_clk, 128000000);
+			clk_set_rate(mdp->ebi1_clk, 153000000);
 #endif
 			mdp->state &= ~MDP_STATE_STANDBY;
 		} else {

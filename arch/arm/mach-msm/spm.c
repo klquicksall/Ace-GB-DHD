@@ -347,3 +347,4 @@ int __init msm_spm_init(struct msm_spm_platform_data *data, int nr_devs)
 	return 0;
 }
 
+
